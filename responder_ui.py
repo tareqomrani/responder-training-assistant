@@ -1,8 +1,8 @@
 import streamlit as st
-from openai import OpenAI
+import openai
 
-# Explicitly pass the API key from Streamlit secrets
-client = OpenAI(api_key=st.secrets["openai_api_key"])
+# Use legacy OpenAI syntax (works on Streamlit Cloud)
+openai.api_key = st.secrets["openai_api_key"]
 
 st.title("Simulated SOC Responder Training Assistant")
 st.write("Paste a security incident scenario. Get simulated triage, response steps, and communication guidance.")
@@ -24,7 +24,7 @@ if st.button("Simulate Response"):
             f"Scenario: {scenario}"
         )
         with st.spinner("Simulating response..."):
-            response = client.chat.completions.create(
+            response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a cybersecurity incident responder trainer."},
