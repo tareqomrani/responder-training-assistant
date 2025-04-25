@@ -1,7 +1,7 @@
 import streamlit as st
 import openai
 
-# Use legacy OpenAI syntax for compatibility
+# Legacy syntax — explicit API key assignment from Streamlit secrets
 openai.api_key = st.secrets["openai_api_key"]
 
 st.title("Simulated SOC Responder Training Assistant")
@@ -17,10 +17,10 @@ if st.button("Simulate Response"):
     else:
         prompt = (
             f"Act as a {level} in a SOC team. Given this scenario, provide: "
-            "- 1. Initial triage assessment\\n"
-            "- 2. Action steps\\n"
-            "- 3. Internal ticket note\\n"
-            "- 4. Suggested response to user (if relevant)\\n"
+            "- 1. Initial triage assessment\n"
+            "- 2. Action steps\n"
+            "- 3. Internal ticket note\n"
+            "- 4. Suggested response to user (if relevant)\n"
             f"Scenario: {scenario}"
         )
         with st.spinner("Simulating response..."):
@@ -32,6 +32,6 @@ if st.button("Simulate Response"):
                 ],
                 temperature=0.6
             )
-            answer = response.choices[0].message.content
+            answer = response.choices[0].message["content"]
             st.subheader("Simulated Response")
             st.write(answer)
