@@ -1,7 +1,8 @@
 import streamlit as st
 import openai
+import time
 
-# Legacy syntax — explicit API key assignment from Streamlit secrets
+# Legacy API key method
 openai.api_key = st.secrets["openai_api_key"]
 
 st.title("Simulated SOC Responder Training Assistant")
@@ -23,15 +24,33 @@ if st.button("Simulate Response"):
             "- 4. Suggested response to user (if relevant)\n"
             f"Scenario: {scenario}"
         )
-        with st.spinner("Simulating response..."):
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a cybersecurity incident responder trainer."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.6
-            )
+
+        MAX_RETRIES = 3
+        RETRY_DELAY = 5
+        response = None
+
+        for attempt in range(MAX_RETRIES):
+            try:
+                with st.spinner(f"Contacting OpenAI... (attempt {attempt + 1})"):
+                    response = openai.ChatCompletion.create(
+                        model="gpt-3.5-turbo",
+                        messages=[
+                            {"role": "system", "content": "You are a cybersecurity incident responder trainer."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        temperature=0.6
+                    )
+                break
+            except openai.error.RateLimitError:
+                st.warning(f"Rate limit hit. Retrying in {RETRY_DELAY} seconds...")
+                time.sleep(RETRY_DELAY)
+            except openai.error.OpenAIError as e:
+                st.error(f"OpenAI API error: {str(e)}")
+                break
+
+        if response:
             answer = response.choices[0].message["content"]
             st.subheader("Simulated Response")
             st.write(answer)
+        else:
+            st.error("Failed to generate response after multiple retries.")
