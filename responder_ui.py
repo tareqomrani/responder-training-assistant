@@ -2,7 +2,7 @@ import streamlit as st
 import openai
 import time
 
-# Legacy API key method
+# Use API key from Streamlit secrets
 openai.api_key = st.secrets["openai_api_key"]
 
 st.title("Simulated SOC Responder Training Assistant")
@@ -17,7 +17,7 @@ if st.button("Simulate Response"):
         st.warning("Please enter a scenario to simulate.")
     else:
         prompt = (
-            f"Act as a {level} in a SOC team. Given this scenario, provide: "
+            f"Act as a {level} in a SOC team. Given this scenario, provide:\n"
             "- 1. Initial triage assessment\n"
             "- 2. Action steps\n"
             "- 3. Internal ticket note\n"
@@ -32,12 +32,10 @@ if st.button("Simulate Response"):
         for attempt in range(MAX_RETRIES):
             try:
                 with st.spinner(f"Contacting OpenAI... (attempt {attempt + 1})"):
-                    response = openai.ChatCompletion.create(
-                        model="gpt-3.5-turbo",
-                        messages=[
-                            {"role": "system", "content": "You are a cybersecurity incident responder trainer."},
-                            {"role": "user", "content": prompt}
-                        ],
+                    response = openai.Completion.create(
+                        model="text-davinci-003",
+                        prompt=prompt,
+                        max_tokens=800,
                         temperature=0.6
                     )
                 break
@@ -49,7 +47,7 @@ if st.button("Simulate Response"):
                 break
 
         if response:
-            answer = response.choices[0].message["content"]
+            answer = response.choices[0].text.strip()
             st.subheader("Simulated Response")
             st.write(answer)
         else:
