@@ -1,12 +1,8 @@
 import streamlit as st
-import os
 from openai import OpenAI
 
-# Push API key from Streamlit secrets into environment variable
-os.environ["OPENAI_API_KEY"] = st.secrets["openai_api_key"]
-
-# OpenAI client using auto-detect from environment
-client = OpenAI()
+# Explicitly pass the API key from Streamlit secrets
+client = OpenAI(api_key=st.secrets["openai_api_key"])
 
 st.title("Simulated SOC Responder Training Assistant")
 st.write("Paste a security incident scenario. Get simulated triage, response steps, and communication guidance.")
