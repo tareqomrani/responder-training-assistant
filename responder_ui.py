@@ -1,8 +1,8 @@
 import streamlit as st
 from openai import OpenAI
 
-# Properly retrieve API key from Streamlit secrets
-client = OpenAI(api_key=st.secrets["openai_api_key"])
+# Automatically detect API key from Streamlit secrets or env variable
+client = OpenAI()
 
 st.title("Simulated SOC Responder Training Assistant")
 st.write("Paste a security incident scenario. Get simulated triage, response steps, and communication guidance.")
