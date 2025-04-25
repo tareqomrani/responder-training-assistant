@@ -1,9 +1,8 @@
 import streamlit as st
-import os
 from openai import OpenAI
 
-# Initialize OpenAI client
-client = OpenAI(api_key=st.secrets.get("openai_api_key") or os.getenv("OPENAI_API_KEY"))
+# Properly retrieve API key from Streamlit secrets
+client = OpenAI(api_key=st.secrets["openai_api_key"])
 
 st.title("Simulated SOC Responder Training Assistant")
 st.write("Paste a security incident scenario. Get simulated triage, response steps, and communication guidance.")
@@ -13,9 +12,7 @@ scenario = st.text_area("Incident Scenario (e.g. suspicious login, phishing emai
 level = st.selectbox("Simulation Level", ["Junior Analyst", "Intermediate Responder", "Advanced Drill"])
 
 if st.button("Simulate Response"):
-    if not (st.secrets.get("openai_api_key") or os.getenv("OPENAI_API_KEY")):
-        st.error("OpenAI API key not found. Set it in Streamlit secrets or as an environment variable.")
-    elif not scenario.strip():
+    if not scenario.strip():
         st.warning("Please enter a scenario to simulate.")
     else:
         prompt = (
